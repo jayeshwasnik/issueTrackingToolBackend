@@ -12,6 +12,7 @@ const token = require('../libs/tokenLib');
 
 /* Models */
 const UserModel = mongoose.model('User');
+const AuthModel = mongoose.model('Auth')
 
 
 
@@ -168,11 +169,64 @@ let loginFunction = (req, res) => {
             })
         })
     }
+
+    let saveToken = (tokenDetails) => {
+        console.log("save token");
+        return new Promise((resolve, reject) => {
+            AuthModel.findOne({ userId: tokenDetails.userId }, (err, retrievedTokenDetails) => {
+                if (err) {
+                    console.log(err.message, 'userController: saveToken', 10)
+                    let apiResponse = response.generate(true, 'Failed To Generate Token', 500, null)
+                    reject(apiResponse)
+                } else if (check.isEmpty(retrievedTokenDetails)) {
+                    let newAuthToken = new AuthModel({
+                        userId: tokenDetails.userId,
+                        authToken: tokenDetails.token,
+                        tokenSecret: tokenDetails.tokenSecret,
+                        tokenGenerationTime: time.now()
+                    })
+                    newAuthToken.save((err, newTokenDetails) => {
+                        if (err) {
+                            console.log(err)
+                            logger.error(err.message, 'userController: saveToken', 10)
+                            let apiResponse = response.generate(true, 'Failed To Generate Token', 500, null)
+                            reject(apiResponse)
+                        } else {
+                            let responseBody = {
+                                authToken: newTokenDetails.authToken,
+                                userDetails: tokenDetails.userDetails
+                            }
+                            resolve(responseBody)
+                        }
+                    })
+                } else {
+                    retrievedTokenDetails.authToken = tokenDetails.token
+                    retrievedTokenDetails.tokenSecret = tokenDetails.tokenSecret
+                    retrievedTokenDetails.tokenGenerationTime = time.now()
+                    retrievedTokenDetails.save((err, newTokenDetails) => {
+                        if (err) {
+                            console.log(err)
+                            logger.error(err.message, 'userController: saveToken', 10)
+                            let apiResponse = response.generate(true, 'Failed To Generate Token', 500, null)
+                            reject(apiResponse)
+                        } else {
+                            let responseBody = {
+                                authToken: newTokenDetails.authToken,
+                                userDetails: tokenDetails.userDetails
+                            }
+                            resolve(responseBody)
+                        }
+                    })
+                }
+            })
+        })
+    }
    
 
     findUser(req,res)
         .then(validatePassword)
         .then(generateToken)
+        .then(saveToken)
         .then((resolve) => {
             let apiResponse = response.generate(false, 'Login Successful', 200, resolve)
             res.status(200)

@@ -35,6 +35,10 @@ let userSchema = new Schema({
   createdOn :{
     type:Date,
     default:""
+  },
+  social:{
+    type:Boolean,
+    default:false
   }
 
 
