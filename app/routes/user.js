@@ -95,6 +95,25 @@ module.exports.setRouter = (app) => {
         }
     */
 
+    app.get(`${baseUrl}/getAllUserNames`,userController.getAllUserNames)
+        /**
+     * @apiGroup users
+     * @apiVersion  1.0.0
+     * @api {post} /api/v1/users/getAllUserNames to get All UserNames
+     *
+     * @apiParam {string} userId userId of the user. (auth headers) (required)
+     *
+     * @apiSuccess {object} myResponse shows error status, message, http status code, result.
+     * 
+     * @apiSuccessExample {object} Success-Response:
+         {
+            "error": false,
+            "message": "Logged Out Successfully",
+            "status": 200,
+            "data": null
+
+        }
+    */
 
     
 

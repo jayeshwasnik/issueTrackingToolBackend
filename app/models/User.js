@@ -12,6 +12,10 @@ let userSchema = new Schema({
     index: true,
     unique: true
   },
+  userName:{
+    type: String,
+    default: ''
+  },
   firstName: {
     type: String,
     default: ''

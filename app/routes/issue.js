@@ -31,7 +31,7 @@ var upload = multer({
     fileSize: 1024 * 1024 * 15
   },
   fileFilter: (req, file, cb) => {
-    if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg" ||file.mimetype=="text/txt") {
+    if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg" ) {
       cb(null, true);
     } else {
       cb(null, false);
@@ -87,6 +87,67 @@ app.get(`${issueUrl}/:issueId`, auth.isAuthorized, issueController.getAnIssue);
 * @apiGroup issue
 * @apiVersion  1.0.0
 * @api {get} /api/v1/issue/:issueId to get an issue.
+*
+* @apiParam {string} userId userId of the user. (auth headers) (required)
+*
+* @apiSuccess {object} myResponse shows error status, message, http status code, result.
+* 
+* @apiSuccessExample {object} Success-Response:
+ {
+    "error": false,
+    "message": "Logged Out Successfully",
+    "status": 200,
+    "data": null
+
+}
+*/
+
+app.get(`${issueUrl}/:userName/getIssuesOfUser`, issueController.getIssuesOfUser);
+/**
+* @apiGroup issue
+* @apiVersion  1.0.0
+* @api {get} /api/v1/issue/getAllIssues to getAllIssues.
+*
+* @apiParam {string} userId userId of the user. (auth headers) (required)
+*
+* @apiSuccess {object} myResponse shows error status, message, http status code, result.
+* 
+* @apiSuccessExample {object} Success-Response:
+ {
+    "error": false,
+    "message": "Logged Out Successfully",
+    "status": 200,
+    "data": null
+
+}
+*/
+
+app.get(`${issueUrl}/search/:searchString`, issueController.searchIssues);
+/**
+* @apiGroup issue
+* @apiVersion  1.0.0
+* @api {get} /api/v1/issue/getAllIssues to getAllIssues.
+*
+* @apiParam {string} userId userId of the user. (auth headers) (required)
+*
+* @apiSuccess {object} myResponse shows error status, message, http status code, result.
+* 
+* @apiSuccessExample {object} Success-Response:
+ {
+    "error": false,
+    "message": "Logged Out Successfully",
+    "status": 200,
+    "data": null
+
+}
+*/
+
+
+app.get(`${issueUrl}/:issueId/getIssueById`, issueController.getIssueById);
+/**
+* @apiGroup issue
+* @apiVersion  1.0.0
+* @api {get} /api/v1/issue/getAllIssues to getAllIssues.
 *
 * @apiParam {string} userId userId of the user. (auth headers) (required)
 *

@@ -6,6 +6,7 @@ const logger = require('./../libs/loggerLib');
 const validateInput = require('../libs/paramsValidationLib');
 const check = require('../libs/checkLib');
 const multer = require('multer');
+var Regex = require("regex");
 
 //router = express.Router();
 
@@ -13,40 +14,40 @@ const multer = require('multer');
 const IssueModel = mongoose.model('Issue');
 
 // Multer File upload settings
-const DIR = '../public/';
+// const DIR = '../public/';
 
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, DIR);
-    },
-    filename: (req, file, cb) => {
-      const fileName = file.originalname.toLowerCase().split(' ').join('-');
-      cb(null, fileName)
-    }
-  });
+// const storage = multer.diskStorage({
+//     destination: (req, file, cb) => {
+//       cb(null, DIR);
+//     },
+//     filename: (req, file, cb) => {
+//       const fileName = file.originalname.toLowerCase().split(' ').join('-');
+//       cb(null, fileName)
+//     }
+//   });
 
-// Multer Mime Type Validation size limit is 15MB
-var upload = multer({
-    storage: storage,
-    limits: {
-      fileSize: 1024 * 1024 * 15
-    },
-    fileFilter: (req, file, cb) => {
-      if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
-        cb(null, true);
-      } else {
-        cb(null, false);
-        return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
-      }
-    }
-  });
+// // Multer Mime Type Validation size limit is 15MB
+// var upload = multer({
+//     storage: storage,
+//     limits: {
+//       fileSize: 1024 * 1024 * 15
+//     },
+//     fileFilter: (req, file, cb) => {
+//       if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
+//         cb(null, true);
+//       } else {
+//         cb(null, false);
+//         return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
+//       }
+//     }
+//   });
 
 
 let createIssue = (req, res) =>{
 
-    upload.single('attachment');
-    const url = req.protocol + '://' + req.get('host')
+    //upload.single('attachment');
+    const url = req.protocol + '://' + req.get('host');
     const issue = new IssueModel({
         issueId: shortid.generate(),
       title: req.body.title,
@@ -110,15 +111,48 @@ let createIssue = (req, res) =>{
             message: "Issue not found!"
           });
         }
-      });
-      
-      
+      }); 
  } 
+
+let getIssuesOfUser=(req,res)=>{
+IssueModel.find({assignee:req.params.userName},function(err,data){
+  if(err) res.send(err);
+  res.send(data);
+}
+  );
+
+  
+}
+
+let getIssueById=(req,res)=>{
+  IssueModel.find({issueId:req.params.issueId},function(err,data){
+    if(err) res.send(err);
+    res.send(data);
+  }
+    );
+}
+
+let searchIssues=(req,res)=>{
+  let searchString=req.params.searchString;
+  console.log(searchString);
+  var re = new RegExp(searchString, 'i');
+  console.log(re);
+  IssueModel.find({title:re},function(err,data){
+    if(err) res.send(err);
+    res.send(data);
+  });
+}
+
+
+
 
  module.exports = {
 
     createIssue: createIssue,
     getAllIssues: getAllIssues,
-    getAnIssue: getAnIssue
+    getAnIssue: getAnIssue,
+    getIssuesOfUser:getIssuesOfUser,
+    searchIssues:searchIssues,
+    getIssueById:getIssueById
 
 }// end exports

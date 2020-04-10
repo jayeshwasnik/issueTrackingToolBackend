@@ -42,7 +42,7 @@ let signUpFunction = (req, res) => {
 
     let createUser = () => {
         return new Promise((resolve, reject) => {
-            UserModel.findOne({ email: req.body.email })
+            UserModel.findOne({ userName: req.body.userName })
                 .exec((err, retrievedUserDetails) => {
                     if (err) {
                         logger.error(err.message, 'userController: createUser', 10)
@@ -52,6 +52,7 @@ let signUpFunction = (req, res) => {
                         console.log(req.body)
                         let newUser = new UserModel({
                             userId: shortid.generate(),
+                            userName:req.body.userName,
                             firstName: req.body.firstName,
                             lastName: req.body.lastName || '',
                             email: req.body.email.toLowerCase(),
@@ -72,7 +73,7 @@ let signUpFunction = (req, res) => {
                         })
                     } else {
                         logger.error('User Cannot Be Created.User Already Present', 'userController: createUser', 4)
-                        let apiResponse = response.generate(true, 'User Already Present With this Email', 403, null)
+                        let apiResponse = response.generate(true, 'User Already Present With this UserName,give a different username', 403, null)
                         reject(apiResponse)
                     }
                 })
@@ -262,11 +263,20 @@ let logout = (req, res) => {
       })
 } // end of the logout function.
 
+//to send all the usernames present
+let getAllUserNames=(req,res)=>{
+  
+    UserModel.find({}, 'userName', function(err, userNames){
+        if(err) return next(err);
+        res.send(userNames);
+      });
+}
 
 module.exports = {
 
     signUpFunction: signUpFunction,
     loginFunction: loginFunction,
-    logout: logout
+    logout: logout,
+    getAllUserNames:getAllUserNames
 
 }// end exports
